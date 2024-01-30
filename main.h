@@ -7,7 +7,6 @@
 #include <math.h>
 #include <limits.h>
 
-/* Functions prototypes */
 
 int print_char(char c);
 int print_string(char *s);
