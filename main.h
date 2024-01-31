@@ -1,115 +1,115 @@
 #ifndef MAIN_H
 #define MAIN_H
+
+
+/* begin standard C header files */
+#include <stdlib.h>
 #include <stdarg.h>
-#include <stdio.h>
 #include <unistd.h>
+#include <limits.h>
+#include <stdio.h>
 
-#define UNUSED(x) (void)(x)
-#define BUFF_SIZE 1024
+/* macros */
 
-/* FLAGS */
-#define F_MINUS 1
-#define F_PLUS 2
-#define F_ZERO 4
-#define F_HASH 8
-#define F_SPACE 16
+#define BUFSIZE 1024
+#define TRUE (1 == 1)
+#define FALSE !TRUE
+#define LOWHEX 0
+#define UPHEX 1
 
-/* SIZES */
-#define S_LONG 2
-#define S_SHORT 1
-
+/* structs */
 /**
- * struct fmt - Struct op
- *
- * @fmt: The format.
- * @fn: The function associated.
+ * struct inventory_s - inventory of common variables needed
+ * @fmt: the input format string
+ * @i: index to traverse the format string
+ * @args: the variadic arguments list of input arguments
+ * @buffer: buffer to be written to before writing to stdout
+ * @buf_index: index to traverse the buffer, also total chars written
+ * @flag: notifies if there was a modifier flag
+ * @space: notifies if space was printed
+ * @c0: character to be written to buffer
+ * @c1: character checking after % character
+ * @c2: character to check 2 spaces after % symbol
+ * @c3: unused for now, but may become a third specifier
+ * @error: indicates error or not (0 no error, 1 error)
  */
-struct fmt
+typedef struct inventory_s
 {
-	char fmt;
-	int (*fn)(va_list, char[], int, int, int, int);
-};
-
+	const char *fmt;
+	int i;
+	va_list *args;
+	char *buffer;
+	int buf_index;
+	int flag;
+	int space;
+	char c0;
+	char c1;
+	char c2;
+	char c3;
+	int error;
+} inventory_t;
 
 /**
- * typedef struct fmt fmt_t - Struct op
- *
- * @fmt: The format.
- * @fm_t: The function associated.
+ * struct matches_s - printf specifiers and paired function
+ * @ch: the specifier
+ * @func: pointer to the conversion specifier function
  */
-typedef struct fmt fmt_t;
+typedef struct matches_s
+{
+	char ch;
+	void (*func)(inventory_t *inv);
+} matches_t;
 
+/* initializing and ending functions */
 int _printf(const char *format, ...);
-int handle_print(const char *fmt, int *i,
-va_list list, char buffer[], int flags, int width, int precision, int size);
+inventory_t *build_inventory(va_list *args_list, const char *format);
+int end_func(inventory_t *arg_inv);
 
+/* custom memory allocation and buffer */
+void *_calloc(unsigned int nmemb, unsigned int size);
+void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
+void write_buffer(inventory_t *inv);
+void puts_buffer(inventory_t *inv, char *str);
 
-/* Funtions to print chars and strings */
-int print_char(va_list types, char buffer[],
-	int flags, int width, int precision, int size);
-int print_string(va_list types, char buffer[],
-	int flags, int width, int precision, int size);
-int print_percent(va_list types, char buffer[],
-	int flags, int width, int precision, int size);
+/* string functions */
+void rev_string(char *s);
+int _strlen(char *s);
+int _strlenconst(const char *s);
+int _putchar(char c);
+void puts_mod(char *str, unsigned int l);
 
-/* Functions to print numbers */
-int print_int(va_list types, char buffer[],
-	int flags, int width, int precision, int size);
-int print_binary(va_list types, char buffer[],
-	int flags, int width, int precision, int size);
-int print_unsigned(va_list types, char buffer[],
-	int flags, int width, int precision, int size);
-int print_octal(va_list types, char buffer[],
-	int flags, int width, int precision, int size);
-int print_hexadecimal(va_list types, char buffer[],
-	int flags, int width, int precision, int size);
-int print_hexa_upper(va_list types, char buffer[],
-	int flags, int width, int precision, int size);
+/* parse and match functionality */
+void (*match_specifier(inventory_t *inv))(inventory_t *inv);
+void parse_specifiers(inventory_t *inv);
 
-int print_hexa(va_list types, char map_to[],
-char buffer[], int flags, char flag_ch, int width, int precision, int size);
+/* hexadecimal */
+void print_hex(inventory_t *inv, unsigned long int n, int hexcase, int size);
+void p_longlowhex(inventory_t *inv);
+void p_longuphex(inventory_t *inv);
+void p_lowhex(inventory_t *inv);
+void p_uphex(inventory_t *inv);
 
-/* Function to print non printable characters */
-int print_non_printable(va_list types, char buffer[],
-	int flags, int width, int precision, int size);
+/* integers */
+void print_integers(inventory_t *inv, long int n);
+void p_int(inventory_t *inv);
+void p_longint(inventory_t *inv);
+void print_unsign(inventory_t *inv, unsigned long int n);
+void p_uint(inventory_t *inv);
+void p_ulongint(inventory_t *inv);
 
-/* Funcion to print memory address */
-int print_pointer(va_list types, char buffer[],
-	int flags, int width, int precision, int size);
+/* octals */
+void print_oct(inventory_t *inv, unsigned long int n, int size);
+void p_oct(inventory_t *inv);
+void p_longoct(inventory_t *inv);
 
-/* Funciotns to handle other specifiers */
-int get_flags(const char *format, int *i);
-int get_width(const char *format, int *i, va_list list);
-int get_precision(const char *format, int *i, va_list list);
-int get_size(const char *format, int *i);
+/* handles specifier functions */
+void p_char(inventory_t *inv);
+void p_string(inventory_t *inv);
+void p_string_hex(inventory_t *inv);
+void p_pointer(inventory_t *inv);
+void p_rev_string(inventory_t *inv);
+void p_rot13(inventory_t *inv);
+void p_percent(inventory_t *inv);
+void p_binary(inventory_t *inv);
 
-/*Function to print string in reverse*/
-int print_reverse(va_list types, char buffer[],
-	int flags, int width, int precision, int size);
-
-/*Function to print a string in rot 13*/
-int print_rot13string(va_list types, char buffer[],
-	int flags, int width, int precision, int size);
-
-/* width handler */
-int handle_write_char(char c, char buffer[],
-	int flags, int width, int precision, int size);
-int write_number(int is_positive, int ind, char buffer[],
-	int flags, int width, int precision, int size);
-int write_num(int ind, char bff[], int flags, int width, int precision,
-	int length, char padd, char extra_c);
-int write_pointer(char buffer[], int ind, int length,
-	int width, int flags, char padd, char extra_c, int padd_start);
-
-int write_unsgnd(int is_negative, int ind,
-char buffer[],
-	int flags, int width, int precision, int size);
-
-int is_printable(char);
-int append_hexa_code(char, char[], int);
-int is_digit(char);
-
-long int convert_size_number(long int num, int size);
-long int convert_size_unsgnd(unsigned long int num, int size);
-
-#endif
+#endif /* end include guard for header files */
