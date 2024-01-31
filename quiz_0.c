@@ -1,48 +1,47 @@
 #include "main.h"
 /**
- * _printf - replication of some of the features from C function printf()
- * @format: character string of directives, flags, modifiers, & specifiers
- * Description: This function uses the variable arguments functionality and is
- * supposed to resemble printf().  Please review the README for more
- * information on how it works.
- * Return: number of characters printed
+ * _printf - main entry point
+ * @format: identifier to look for.
+ *
+ * Return: the length of the string.
  */
-int _printf(const char *format, ...)
+int _printf(const char * const format, ...)
 {
-	va_list args_list;
-	inventory_t *inv;
-	void (*temp_func)(inventory_t *);
+	convert p[] = {
+		{"%s", print_s}, {"%c", print_c},
+		{"%%", print_37},
+		{"%i", print_i}, {"%d", print_d}, {"%r", print_revs},
+		{"%R", print_rot13}, {"%b", print_bin},
+		{"%u", print_unsigned},
+		{"%o", print_oct}, {"%x", print_hex}, {"%X", print_HEX},
+		{"%S", print_exc_string}, {"%p", print_pointer}
+	};
 
-	if (!format)
+	va_list args;
+	int i = 0, j, length = 0;
+
+	va_start(args, format);
+	if (format == NULL || (format[0] == '%' && format[1] == '\0'))
 		return (-1);
-	va_start(args_list, format);
-	inv = build_inventory(&args_list, format);
 
-	while (inv && format[inv->i] && !inv->error)
+Here:
+	while (format[i] != '\0')
 	{
-		inv->c0 = format[inv->i];
-		if (inv->c0 != '%')
-			write_buffer(inv);
-		else
+		j = 13;
+		while (j >= 0)
 		{
-			parse_specifiers(inv);
-			temp_func = match_specifier(inv);
-			if (temp_func)
-				temp_func(inv);
-			else if (inv->c1)
+			if (p[j].ph[0] == format[i] && p[j].ph[1] == format[i + 1])
 			{
-				if (inv->flag)
-					inv->flag = 0;
-				write_buffer(inv);
+				length += p[j].function(args);
+				i = i + 2;
+				goto Here;
 			}
-			else
-			{
-				if (inv->space)
-					inv->buffer[--(inv->buf_index)] = '\0';
-				inv->error = 1;
-			}
+			j--;
 		}
-		inv->i++;
+		_putchar(format[i]);
+		length++;
+		i++;
 	}
-	return (end_func(inv));
+	va_end(args);
+	return (length);
 }
