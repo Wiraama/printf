@@ -32,8 +32,13 @@ int print_S(va_list arg)
 				_putchar('0');
 				count++;
 			}
-			count = count + print_extra(value);
+			count = count + print_Sextra(value);
 
 		}
-
-
+		else
+		{
+			_putchar(string[i]);
+		}
+	}
+	return (0);
+}

@@ -3,7 +3,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <unistd.h>
 
+typedef struct formating
+{
+	char *id;
+	int *pointer();
+} function;
+
+int print_rot(va_list arg);
+int print_rev(va_list arg);
+int print_hexadecimal(unsigned long int num);
+int print_pointer(va_list arg);
+int print_S(va_list arg);
+int print_Sextra(unsigned int value);
 int print_HEX(va_list arg);
 int print_hex(va_list arg);
 int print_octa(va_list arg);
