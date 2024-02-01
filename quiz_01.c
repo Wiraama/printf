@@ -9,12 +9,11 @@
  *
  * Return: length of string
  */
-int print_string(char *)
+int print_string(char *word)
 {
 	va_list str;
 
 	int length, i;
-	char *word;
 
 	word = va_arg(str, char *);
 

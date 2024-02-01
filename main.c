@@ -37,7 +37,7 @@ int my_main(const char *format, ...)
 	/** cheaking if format is null or only modulo **/
 	if (format == NULL || (format[0] == '%' && format[1] == '\0'))
 	{
-		return (-1)
+		return (-1);
 	}
 
 	/** loop to look over the format **/
@@ -51,7 +51,7 @@ int my_main(const char *format, ...)
 			{
 				length = length + array[count].pointer(arg);
 				i = i + 2;
-				goto Here; /** jumps back to here to cheack place holders **/
+				goto here; /** jumps back to here to cheack place holders **/
 			}
 			count--;
 		}
