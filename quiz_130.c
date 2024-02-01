@@ -8,10 +8,11 @@
  */
 int print_rev(va_list arg)
 {
-	char *pointer;
+	char *pointer = va_arg(arg, char *);
 	int i, count;
 
-	if (*pointer == NULL) /** pointer is null **/
+	count = 0;
+	if (pointer == NULL) /** pointer is null **/
 	{
 		return (-1);
 	}

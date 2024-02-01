@@ -27,7 +27,7 @@ int print_int(const char *format, ...)
 					_putchar('-');
 					num = -num;
 				}
-				printed_chars += print_integer(num);
+				printed_chars += print_int(num);
 				format += 2; /** to jump conversion specifier **/
 				continue;
 			}

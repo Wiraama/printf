@@ -9,11 +9,9 @@
  */
 
 
-int print_char(char)
+int print_char(va_list str)
 {
-	va_list str;
-
-	char = c;
+	char c;
 	
 	c = va_arg(str, int);
 	_putchar(c);

@@ -11,10 +11,11 @@ int _strlen(char *str)
 {
 	int i;
 
-	for (i = 0; str[i] != 0; i++)
+	for (i = 0; str[i] != '\0'; i++)
 	{
-		return (i);
 	}
+
+	return (i);
 }
 /**
  * _strlen_constant - main entry
@@ -29,6 +30,7 @@ int _strlen_constant(const char *str)
 
 	for (i = 0; str[i] != 0; i++)
 	{
-		return (i);
+
 	}
+	return (i);
 }

@@ -8,9 +8,10 @@
 typedef struct formating
 {
 	char *id;
-	int *pointer();
+	int *pointer;
 } function;
 
+int my_main(const char *format, ...);
 int print_rot(va_list arg);
 int print_rev(va_list arg);
 int print_hexadecimal(unsigned long int num);
@@ -27,7 +28,7 @@ int print_mod(void);
 int _strlen(char *str);
 int _strlen_constant(const char *str);
 int print_string(char *);
-int print_char(char *);
+int print_char(va_list str);
 int _putchar(char c);
 int _printf(const char *format, ...);
 
