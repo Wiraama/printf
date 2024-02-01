@@ -1,84 +1,49 @@
 #include "main.h"
-
-unsigned int print_width(buffer_t *output, unsigned int printed,
-		unsigned char flags, int wid);
-unsigned int print_string_width(buffer_t *output,
-		unsigned char flags, int wid, int prec, int size);
-unsigned int print_neg_width(buffer_t *output, unsigned int printed,
-		unsigned char flags, int wid);
-
 /**
- * print_width - Stores leading spaces to a buffer for a width modifier.
- * @output: A buffer_t struct containing a character array.
- * @printed: The current number of characters already printed to output
- *           for a given number specifier.
- * @flags: Flag modifiers.
- * @wid: A width modifier.
- *
- * Return: The number of bytes stored to the buffer.
+ * handle_print - Prints an argument based on its type
+ * @fmt: Formatted string in which to print the arguments.
+ * @list: List of arguments to be printed.
+ * @ind: ind.
+ * @buffer: Buffer array to handle print.
+ * @flags: Calculates active flags
+ * @width: get width.
+ * @precision: Precision specification
+ * @size: Size specifier
+ * Return: 1 or 2;
  */
-unsigned int print_width(buffer_t *output, unsigned int printed,
-		unsigned char flags, int wid)
+int handle_print(const char *fmt, int *ind, va_list list, char buffer[],
+	int flags, int width, int precision, int size)
 {
-	unsigned int ret = 0;
-	char width = ' ';
+	int i, unknow_len = 0, printed_chars = -1;
+	fmt_t fmt_types[] = {
+		{'c', print_char}, {'s', print_string}, {'%', print_percent},
+		{'i', print_int}, {'d', print_int}, {'b', print_binary},
+		{'u', print_unsigned}, {'o', print_octal}, {'x', print_hexadecimal},
+		{'X', print_hexa_upper}, {'p', print_pointer}, {'S', print_non_printable},
+		{'r', print_reverse}, {'R', print_rot13string}, {'\0', NULL}
+	};
+	for (i = 0; fmt_types[i].fmt != '\0'; i++)
+		if (fmt[*ind] == fmt_types[i].fmt)
+			return (fmt_types[i].fn(list, buffer, flags, width, precision, size));
 
-	if (NEG_FLAG == 0)
+	if (fmt_types[i].fmt == '\0')
 	{
-		for (wid -= printed; wid > 0;)
-			ret += _memcpy(output, &width, 1);
+		if (fmt[*ind] == '\0')
+			return (-1);
+		unknow_len += write(1, "%%", 1);
+		if (fmt[*ind - 1] == ' ')
+			unknow_len += write(1, " ", 1);
+		else if (width)
+		{
+			--(*ind);
+			while (fmt[*ind] != ' ' && fmt[*ind] != '%')
+				--(*ind);
+			if (fmt[*ind] == ' ')
+				--(*ind);
+			return (1);
+		}
+		unknow_len += write(1, &fmt[*ind], 1);
+		return (unknow_len);
 	}
-
-	return (ret);
-}
-
-/**
- * print_string_width - Stores leading spaces to a buffer for a width modifier.
- * @output: A buffer_t struct containing a character array.
- * @flags: Flag modifiers.
- * @wid: A width modifier.
- * @prec: A precision modifier.
- * @size: The size of the string.
- *
- * Return: The number of bytes stored to the buffer.
- */
-unsigned int print_string_width(buffer_t *output,
-		unsigned char flags, int wid, int prec, int size)
-{
-	unsigned int ret = 0;
-	char width = ' ';
-
-	if (NEG_FLAG == 0)
-	{
-		wid -= (prec == -1) ? size : prec;
-		for (; wid > 0; wid--)
-			ret += _memcpy(output, &width, 1);
-	}
-
-	return (ret);
-}
-
-/**
- * print_neg_width - Stores trailing spaces to a buffer for a '-' flag.
- * @output: A buffer_t struct containing a character array.
- * @printed: The current number of bytes already stored to output
- *           for a given specifier.
- * @flags: Flag modifiers.
- * @wid: A width modifier.
- *
- * Return: The number of bytes stored to the buffer.
- */
-unsigned int print_neg_width(buffer_t *output, unsigned int printed,
-		unsigned char flags, int wid)
-{
-	unsigned int ret = 0;
-	char width = ' ';
-
-	if (NEG_FLAG == 1)
-	{
-		for (wid -= printed; wid > 0; wid--)
-			ret += _memcpy(output, &width, 1);
-	}
-
-	return (ret);
+	return (printed_chars);
 }

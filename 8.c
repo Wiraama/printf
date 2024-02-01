@@ -1,73 +1,36 @@
 #include "main.h"
 
-unsigned int _memcpy(buffer_t *output, const char *src, unsigned int n);
-void free_buffer(buffer_t *output);
-buffer_t *init_buffer(void);
-
 /**
- * _memcpy - Copies n bytes from memory area src to
- *           the buffer contained in a buffer_t struct.
- * @output: A buffer_t struct.
- * @src: A pointer to the memory area to copy.
- * @n: The number of bytes to be copied.
+ * get_width - Calculates the width for printing
+ * @format: Formatted string in which to print the arguments.
+ * @i: List of arguments to be printed.
+ * @list: list of arguments.
  *
- * Return: The number of bytes copied.
+ * Return: width.
  */
-unsigned int _memcpy(buffer_t *output, const char *src, unsigned int n)
+int get_width(const char *format, int *i, va_list list)
 {
-	unsigned int index;
+	int curr_i;
+	int width = 0;
 
-	for (index = 0; index < n; index++)
+	for (curr_i = *i + 1; format[curr_i] != '\0'; curr_i++)
 	{
-		*(output->buffer) = *(src + index);
-		(output->len)++;
-
-		if (output->len == 1024)
+		if (is_digit(format[curr_i]))
 		{
-			write(1, output->start, output->len);
-			output->buffer = output->start;
-			output->len = 0;
+			width *= 10;
+			width += format[curr_i] - '0';
 		}
-
+		else if (format[curr_i] == '*')
+		{
+			curr_i++;
+			width = va_arg(list, int);
+			break;
+		}
 		else
-			(output->buffer)++;
+			break;
 	}
 
-	return (n);
-}
+	*i = curr_i - 1;
 
-/**
- * free_buffer - Frees a buffer_t struct.
- * @output: The buffer_t struct to be freed.
- */
-void free_buffer(buffer_t *output)
-{
-	free(output->start);
-	free(output);
-}
-
-/**
- * init_buffer - Initializes a variable of struct type buffer_t.
- *
- * Return: A pointer to the initialized buffer_t.
- */
-buffer_t *init_buffer(void)
-{
-	buffer_t *output;
-
-	output = malloc(sizeof(buffer_t));
-	if (output == NULL)
-		return (NULL);
-
-	output->buffer = malloc(sizeof(char) * 1024);
-	if (output->buffer == NULL)
-	{
-		free(output);
-		return (NULL);
-	}
-
-	output->start = output->buffer;
-	output->len = 0;
-
-	return (output);
+	return (width);
 }
